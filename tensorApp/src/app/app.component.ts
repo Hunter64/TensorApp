@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import * as tf from '@tensorflow/tfjs';
+import * as tf from 'node_modules/@tensorflow/tfjs';
+import { DrawableDirective } from './drawable.directive';
 
 
 @Component({
@@ -13,12 +14,34 @@ export class AppComponent implements OnInit {
   linearModel: tf.Sequential;
   prediction: any;
 
-  //model: tf.model;
-  //@ViewChild(DrawableDirective) canvas;
+  model: tf.LayersModel;
+  @ViewChild(DrawableDirective) canvas;
   ngOnInit(): void {
     this.trainNewModel();
-    //this.loadModel();
+    this.loadModel();
   }
+
+  async loadModel() {
+    var x = tf.loadLayersModel('/assets/model.json')
+    //this.model = await tf.loadModel('/assets/model.json');
+  }
+
+  // async predict(imageData: ImageData) {
+  //   const pred = await tf.tidy(() => {
+
+  //     // Convert the canvas pixels to 
+  //     let img = tf.fromPixels(imageData, 1);
+  //     img = img.reshape([1, 28, 28, 1]);
+  //     img = tf.cast(img, 'float32');
+
+  //     // Make and format the predications
+  //     const output = this.model.predict(img) as any;
+
+  //     // Save predictions on the component
+  //     this.predictions = Array.from(output.dataSync()); 
+  //   });
+
+  // }
 
   async trainNewModel():Promise<any>{
     this.linearModel = tf.sequential();
@@ -33,7 +56,7 @@ export class AppComponent implements OnInit {
 
   }
   
-  predict(val: any) {
+  linearPredict(val: any) {
     var value = Number(val)
     const output = this.linearModel.predict(tf.tensor2d([value], [1, 1])) as any
     console.log(output)
