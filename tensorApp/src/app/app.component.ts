@@ -13,35 +13,38 @@ export class AppComponent implements OnInit {
 
   linearModel: tf.Sequential;
   prediction: any;
-
-  model: tf.LayersModel;
-  @ViewChild(DrawableDirective) canvas;
+  predictions: any;
+  model: tf.Model;
+  @ViewChild(DrawableDirective) canvas: any;
   ngOnInit(): void {
     this.trainNewModel();
     this.loadModel();
   }
 
   async loadModel() {
-    var x = tf.loadLayersModel('/assets/model.json')
-    //this.model = await tf.loadModel('/assets/model.json');
+    //var x = tf.loadLayersModel('/assets/model.json')
+    this.model = await tf.loadModel('/assets/model.json');
   }
 
-  // async predict(imageData: ImageData) {
-  //   const pred = await tf.tidy(() => {
+  async predict(imageData: ImageData) {
 
-  //     // Convert the canvas pixels to 
-  //     let img = tf.fromPixels(imageData, 1);
-  //     img = img.reshape([1, 28, 28, 1]);
-  //     img = tf.cast(img, 'float32');
+    console.log(imageData)
 
-  //     // Make and format the predications
-  //     const output = this.model.predict(img) as any;
+    const pred = await tf.tidy(() => {
 
-  //     // Save predictions on the component
-  //     this.predictions = Array.from(output.dataSync()); 
-  //   });
+      // Convert the canvas pixels to 
+      let img = tf.fromPixels(imageData, 1);
+      //img = img.reshape([1, 28, 28, 1]);
+      img = tf.cast(img, 'float32');
 
-  // }
+      // Make and format the predications
+      const output = this.model.predict(img) as any;
+
+      // Save predictions on the component
+      this.predictions = Array.from(output.dataSync()); 
+    });
+
+  }
 
   async trainNewModel():Promise<any>{
     this.linearModel = tf.sequential();
